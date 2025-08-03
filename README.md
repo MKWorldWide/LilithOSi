@@ -1,4 +1,8 @@
+A Project Blessed by Solar Khan & Lilith.Aethra
+
 # LilithOS - iOS 17.2.1 Custom Firmware for iPhone 13 Pro Max
+
+Consult the [Divine Law](COVENANT.md) and the [documentation site](https://solarkhan.github.io/LilithOSi/) for guidance and updates.
 
 ## 🚀 Project Overview
 LilithOS is a cutting-edge custom firmware project targeting iOS 17.2.1 for iPhone 13 Pro Max devices. This project aims to create a signed IPSW that can be directly installed on compatible devices while maintaining system integrity and security.
