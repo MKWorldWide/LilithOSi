@@ -9,6 +9,7 @@ import sys
 import math
 import argparse
 import logging
+import random  # Use dedicated RNG for reproducible particle effects
 from pathlib import Path
 from typing import Tuple, List, Optional
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -134,44 +135,49 @@ class LilithOSBootAnimation:
         
         return text_img
     
-    def create_particle_system(self, frame: int, total_frames: int) -> Image.Image:
-        """Create animated particle system."""
-        particles = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+    def create_particle_system(
+        self,
+        frame: int,
+        total_frames: int,
+        num_particles: int = 50,
+        seed: Optional[int] = None,
+    ) -> Image.Image:
+        """Create animated particle system.
+
+        Using ``random.Random`` with an optional seed keeps particle motion
+        deterministic per frame while allowing callers to tweak density.
+
+        Args:
+            frame: Current frame index.
+            total_frames: Total number of frames in the animation.
+            num_particles: How many particles to render.
+            seed: Optional seed for reproducible randomness.
+        """
+        rng = random.Random(seed if seed is not None else frame)
+        particles = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(particles)
-        
-        # Particle parameters
-        num_particles = 50
+
         particle_size = 3
         max_velocity = 2
-        
-        for i in range(num_particles):
-            # Generate particle properties
-            seed = (frame * 1000 + i * 100) % 10000
-            x = (seed * 277) % self.width
-            y = (seed * 373) % self.height
-            
-            # Animate particles
-            progress = frame / total_frames
-            wave = math.sin(progress * math.pi * 2 + i * 0.1)
-            
-            # Particle movement
-            x += wave * max_velocity * 10
-            y += progress * max_velocity * 5
-            
-            # Wrap around screen
-            x = x % self.width
-            y = y % self.height
-            
-            # Particle opacity based on position
+        progress = frame / total_frames
+
+        for _ in range(num_particles):
+            # Pseudo-random starting position
+            x = rng.randint(0, self.width - 1)
+            y = rng.randint(0, self.height - 1)
+
+            # Animate particles with a sine wave for subtle movement
+            wave = math.sin(progress * math.pi * 2 + rng.random() * 0.1)
+            x = (x + wave * max_velocity * 10) % self.width
+            y = (y + progress * max_velocity * 5) % self.height
+
             opacity = int(255 * (1 - abs(wave)))
-            
-            # Draw particle
             color = (*self.colors["primary"][:3], opacity)
-            draw.ellipse([
-                x - particle_size, y - particle_size,
-                x + particle_size, y + particle_size
-            ], fill=color)
-        
+            draw.ellipse(
+                [x - particle_size, y - particle_size, x + particle_size, y + particle_size],
+                fill=color,
+            )
+
         return particles
     
     def create_frame(self, frame: int, total_frames: int) -> Image.Image:
@@ -225,7 +231,7 @@ class LilithOSBootAnimation:
             logo.putalpha(alpha)
         
         # Add particle system
-        particles = self.create_particle_system(frame, total_frames)
+        particles = self.create_particle_system(frame, total_frames, seed=frame)
         
         # Create text
         text = self.create_text("LilithOS", 72)
