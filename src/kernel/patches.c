@@ -9,6 +9,7 @@
 #include <mach/vm_map.h>
 #include <mach/vm_region.h>
 #include <mach/vm_prot.h>
+#include <stdio.h> // Added for patch logging
 
 // Kernel patch definitions
 #define KERNEL_BASE 0x80001000
@@ -60,7 +61,8 @@ kern_return_t apply_kernel_patches(void) {
     kernel_map = mach_task_self();
     
     // Apply each patch
-    for (int i = 0; i < sizeof(patches) / sizeof(patches[0]); i++) {
+    size_t patch_count = sizeof(patches) / sizeof(patches[0]);
+    for (size_t i = 0; i < patch_count; i++) {
         struct kernel_patch *patch = &patches[i];
         
         // TODO: Implement actual patch application

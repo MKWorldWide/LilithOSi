@@ -1,0 +1,9 @@
+{
+  "repositories": [
+    {
+      "name": "LilithOSi",
+      "url": "https://github.com/SolarKhan/LilithOSi",
+      "pipeline": "divina-l3"
+    }
+  ]
+}

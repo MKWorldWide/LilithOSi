@@ -131,6 +131,7 @@ coverage.xml
 # Documentation build
 docs/_build/
 docs/build/
+site/
 
 # Docker
 .dockerignore
